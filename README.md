@@ -108,14 +108,9 @@ Estos resultados muestran una caída importante del rendimiento en la base de da
 
 ## Limitaciones
 
-Este proyecto tiene carácter académico y experimental. Los resultados no constituyen una validación clínica ni permiten utilizar el modelo como herramienta de diagnóstico médico. La generalización entre bases de datos, la representatividad de las imágenes y la interpretabilidad de las predicciones requieren análisis adicionales.
+Este proyecto tiene carácter experimental. Los resultados no constituyen una validación clínica ni permiten utilizar el modelo como herramienta de diagnóstico médico. La generalización entre bases de datos, la representatividad de las imágenes y la interpretabilidad de las predicciones requieren análisis adicionales.
 
-## Contexto académico
 
-**Asignatura:** Modelos de Redes Neuronales  
-**Programa:** Máster en Metodología 
-**Institución:** Universidad Complutense de Madrid  
-**Año:** 2025
 
 ---
 
