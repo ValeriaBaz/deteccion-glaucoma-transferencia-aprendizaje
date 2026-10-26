@@ -1,84 +1,122 @@
 # deteccion-glaucoma-transferencia-aprendizaje
 Clasificación de glaucoma mediante VGG16, transferencia de aprendizaje, evaluación entre bases de datos e interpretabilidad con Grad-CAM.
-# Detección de glaucoma mediante transferencia de aprendizaje con VGG16
 
-## Descripción del proyecto
+# Detección de glaucoma mediante transferencia de aprendizaje
 
-Este proyecto estudia la aplicación de redes neuronales convolucionales a la clasificación de retinografías para distinguir entre imágenes asociadas a ojos normales e imágenes asociadas a glaucoma.
+Proyecto de aprendizaje profundo centrado en la clasificación de imágenes de fondo de ojo para la detección de glaucoma mediante redes neuronales convolucionales y transferencia de aprendizaje.
 
-Se utiliza VGG16, una arquitectura preentrenada con ImageNet, para explorar el efecto de la transferencia de aprendizaje en una tarea de clasificación de imágenes médicas.
-
-El trabajo incluye la evaluación del modelo original, su adaptación mediante una nueva cabeza de clasificación, la comparación del rendimiento entre dos bases de datos y el análisis de las predicciones mediante Grad-CAM.
-
-> **Nota:** Este proyecto tiene fines académicos y experimentales. Los resultados no constituyen una validación clínica ni permiten utilizar el modelo como herramienta de diagnóstico médico.
+El proyecto estudia el uso de **VGG16 preentrenada en ImageNet**, evalúa su rendimiento en diferentes bases de datos y utiliza **Grad-CAM** para explorar las regiones de las imágenes que influyen en las predicciones del modelo.
 
 ## Objetivos
 
-- Evaluar VGG16 con pesos preentrenados en ImageNet sobre la base de datos ACRIMA.
-- Adaptar el modelo mediante transferencia de aprendizaje, manteniendo congeladas las capas convolucionales.
-- Evaluar el modelo adaptado en ACRIMA y RIM-ONE-r2.
-- Comparar el rendimiento mediante el área bajo la curva ROC (AUC) y el F1-score.
-- Visualizar regiones relevantes para las predicciones mediante Grad-CAM.
-- Analizar las limitaciones de generalización entre bases de datos.
+- Evaluar el rendimiento de VGG16 preentrenada sin entrenamiento específico para la tarea.
+- Aplicar transferencia de aprendizaje mediante una arquitectura VGG16 con capas convolucionales congeladas.
+- Analizar el rendimiento del modelo en una base de datos de entrenamiento y prueba y en una base de datos externa.
+- Evaluar métricas de clasificación como accuracy, sensibilidad, especificidad, F1 y AUC.
+- Explorar la interpretabilidad de las predicciones mediante Grad-CAM.
+- Analizar las limitaciones de generalización entre diferentes conjuntos de datos.
 
 ## Metodología
 
-### 1. Evaluación del modelo preentrenado
+### 1. Modelo base
 
-Se evalúa VGG16 con pesos de ImageNet, sin entrenar sus capas para la tarea específica de glaucoma.
+Se evalúa VGG16 con pesos preentrenados en ImageNet sobre imágenes de la base de datos ACRIMA, sin entrenamiento específico para la clasificación de glaucoma.
 
 ### 2. Transferencia de aprendizaje
 
-Se mantienen congeladas las capas convolucionales de VGG16 y se incorpora una cabeza de clasificación personalizada para distinguir entre las dos clases.
+Se mantienen congeladas las capas convolucionales de VGG16 y se añade una cabeza de clasificación personalizada con:
 
-La nueva arquitectura incluye capas densas, normalización por lotes y Dropout.
+- Global Average Pooling.
+- Batch Normalization.
+- Capas densas con activación ReLU.
+- Dropout para reducir el riesgo de sobreajuste.
+- Una capa de salida sigmoide para la clasificación binaria.
 
-### 3. Evaluación en una base de datos externa
+El modelo se entrena con imágenes de ACRIMA utilizando TensorFlow y Keras.
 
-El modelo adaptado con ACRIMA se evalúa posteriormente en RIM-ONE-r2 sin reentrenamiento adicional, con el objetivo de estudiar su comportamiento ante imágenes procedentes de otra base de datos.
+### 3. Evaluación
+
+El modelo entrenado se evalúa en ACRIMA y, sin reentrenamiento, en la base de datos externa RIM-ONE-r2 para estudiar su capacidad de generalización.
 
 ### 4. Interpretabilidad
 
-Se utiliza Grad-CAM para generar mapas de activación que permiten examinar las regiones de las retinografías que contribuyen a las predicciones del modelo.
+Se utiliza Grad-CAM para generar mapas de activación que permiten explorar qué regiones de las imágenes contribuyen a las predicciones del modelo.
 
-## Resultados principales
+## Resultados
 
-| Métrica | ACRIMA | RIM-ONE-r2 |
+### VGG16 preentrenada sin ajuste específico
+
+Evaluación sobre ACRIMA:
+
+| Métrica | Resultado |
+|---|---:|
+| Accuracy | 55,32 % |
+| AUC | 0,582 |
+| Loss | 1,7433 |
+
+### VGG16 con transferencia de aprendizaje
+
+Evaluación sobre ACRIMA:
+
+| Métrica | Resultado |
+|---|---:|
+| Accuracy | 90,78 % |
+| AUC | 0,9710 |
+| F1-score | 0,9008 |
+| Valor predictivo positivo (PPV) | 0,96 |
+| Sensibilidad | 0,87 |
+| Especificidad | 0,87 |
+
+La matriz de confusión obtenida en ACRIMA fue:
+
+| | Predicción normal | Predicción glaucoma |
 |---|---:|---:|
-| Accuracy | 90,78 % | 48,35 % |
-| AUC-ROC | 0,9710 | 0,5467 |
-| F1-score | 0,9008 | 0,2900 |
-| Sensibilidad | 87 % | 19 % |
+| Real normal | 69 | 10 |
+| Real glaucoma | 3 | 59 |
 
-Los resultados corresponden a las evaluaciones descritas en el informe académico.
+### Evaluación externa en RIM-ONE-r2
+
+El modelo entrenado en ACRIMA se evalúa en RIM-ONE-r2 sin reentrenamiento:
+
+| Métrica | Resultado |
+|---|---:|
+| Accuracy | 48,35 % |
+| AUC | 0,5467 |
+| F1-score | 0,2900 |
+| Sensibilidad | 0,19 |
+| Especificidad | 0,86 |
+
+Estos resultados muestran una caída importante del rendimiento en la base de datos externa, lo que pone de manifiesto las dificultades de generalización entre conjuntos de datos.
 
 ## Conclusiones
 
-El modelo adaptado mediante transferencia de aprendizaje alcanza un rendimiento elevado en ACRIMA. Sin embargo, al evaluarlo en RIM-ONE-r2 se observa una reducción considerable de las métricas de rendimiento, especialmente de la sensibilidad y del AUC.
+- La transferencia de aprendizaje mejora sustancialmente los resultados respecto al modelo VGG16 preentrenado sin ajuste específico.
+- El rendimiento obtenido en ACRIMA es elevado, pero no se mantiene al evaluar el modelo en RIM-ONE-r2.
+- La evaluación externa es fundamental para identificar limitaciones de generalización.
+- Grad-CAM ofrece una herramienta visual para explorar las predicciones, aunque los mapas de activación no garantizan que el modelo utilice criterios clínicamente adecuados.
 
-Estos resultados ponen de manifiesto la importancia de evaluar los modelos de aprendizaje profundo con conjuntos de datos independientes y de analizar su capacidad de generalización antes de considerar cualquier posible aplicación clínica.
-
-El uso de Grad-CAM aporta una perspectiva adicional sobre las regiones de las imágenes asociadas a las predicciones, aunque estos mapas no demuestran por sí solos que el modelo utilice criterios clínicamente válidos.
-
-## Tecnologías
+## Tecnologías utilizadas
 
 - Python
-- TensorFlow / Keras
+- TensorFlow
+- Keras
 - VGG16
-- Redes neuronales convolucionales
+- Redes neuronales convolucionales (CNN)
 - Transferencia de aprendizaje
-- Scikit-learn
 - Grad-CAM
 - Evaluación de modelos de clasificación
 
-## Estructura del repositorio
+## Limitaciones
 
-La estructura definitiva se documentará según los notebooks, scripts y resultados que se publiquen.
+Este proyecto tiene carácter académico y experimental. Los resultados no constituyen una validación clínica ni permiten utilizar el modelo como herramienta de diagnóstico médico. La generalización entre bases de datos, la representatividad de las imágenes y la interpretabilidad de las predicciones requieren análisis adicionales.
 
 ## Contexto académico
 
-Proyecto desarrollado en el marco de la asignatura Modelos de Redes Neuronales del Máster en Metodología de las Ciencias del Comportamiento y de la Salud, Universidad Complutense de Madrid, 2025.
+**Asignatura:** Modelos de Redes Neuronales  
+**Programa:** Máster en Metodología 
+**Institución:** Universidad Complutense de Madrid  
+**Año:** 2025
 
-## Limitaciones
+---
 
-El rendimiento observado en bases de datos concretas no garantiza la generalización a otras poblaciones, dispositivos o entornos clínicos. Este proyecto es un ejercicio académico y no constituye un sistema validado para el diagnóstico de glaucoma.
+*Proyecto académico de aprendizaje profundo aplicado al análisis de imágenes médicas.*
