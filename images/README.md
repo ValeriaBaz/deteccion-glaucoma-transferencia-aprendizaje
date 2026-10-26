@@ -1,0 +1,1 @@
+Imágenes principales del proyecto.
